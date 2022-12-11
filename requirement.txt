@@ -1,3 +1,5 @@
 mysql-connector-python==8.0.31
 python==3.9.5
 streamlit_extras==0.2.4
+mysqlclient==2.1.1
+
