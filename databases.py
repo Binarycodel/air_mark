@@ -1,5 +1,4 @@
 import sqlite3 as sq
-from Crypto.PublicKey import RSA 
 import streamlit as st 
 
 class  Database: 
