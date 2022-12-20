@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from PIL import Image
-import mysql.connector
+
 from streamlit_extras import switch_page_button
 import matplotlib.pyplot as plt
 import plotly.express as px 

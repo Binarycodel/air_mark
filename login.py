@@ -1,6 +1,5 @@
 import streamlit as st 
 from streamlit_extras import switch_page_button
-import mysql.connector
 import databases as db
 
 

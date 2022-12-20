@@ -2,7 +2,6 @@ import streamlit as st
 from streamlit_extras import switch_page_button
 import databases as db
 import streamlit as st
-import mysql.connector
 
 
 st.set_page_config(page_title="signup" , page_icon='📈')
