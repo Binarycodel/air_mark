@@ -1,6 +1,6 @@
 import streamlit as st 
 from streamlit_extras import switch_page_button
-# import database as db
+import databases as db
 import streamlit as st
 import mysql.connector
 
@@ -8,36 +8,18 @@ import mysql.connector
 st.set_page_config(page_title="signup" , page_icon='📈')
 
 # ==============  DATABSE CONNECTIVITIES ======================
-@st.experimental_singleton
-def init_connection():
-    return mysql.connector.connect(**st.secrets["mysql"])
 
-conn = init_connection()
 
-# Perform query.
-# Uses st.experimental_memo to only rerun when the query changes or after 10 min.
+database = db.Database()
 
-@st.experimental_memo(ttl=600)
+
 def get_record(query):
-    with conn.cursor() as cur:
-        cur.execute(query)
-        cur 
-        return cur.fetchall()
+    return database.custom_query(query)
 
 
-
-
-@st.experimental_memo(ttl=600)
-def add_user( first_name, second_name, email, password, sex, age):
-    query = '''INSERT INTO airmark_databases.user( first_name, second_name, email, password, sex, age ) VALUES(%s, %s, %s, %s ,%s, %s)'''
-    isSuccess = False 
-    with conn.cursor() as curs: 
-        # (id, first_name, second_name, email, password)
-        curs.execute(query , ( first_name, second_name, email, password , sex, age))
-    
-        isSuccess = True
-        print('execution successful')
-    return isSuccess
+def add_user(first_name, second_name, email, password,sex, age):
+    database.insert_to_user_table(first_name, second_name, email, password, sex, age)
+    return True 
 
 # ========================== END OF DATABASE CONNECTION ===============================
 
@@ -96,11 +78,11 @@ if col_one.button('Register'):
     print(regitem)
     if "" not in regitem: 
         if password2 == password : 
-            rows = get_record("SELECT * from user;")
+            rows = get_record("SELECT * from user_table;")
             id = len(rows) + 1
 
             # checking if gemail exist ... 
-            emails = get_record('select email from user')
+            emails = get_record('select email from user_table')
             em = [m for m in emails]
             st.write(em)
             if email not in em: 

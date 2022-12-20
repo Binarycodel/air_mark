@@ -1,12 +1,16 @@
 import streamlit as st 
 from streamlit_extras import switch_page_button
 import mysql.connector
-
+import databases as db
 
 
 # defining global parameter
 login_status = False
 
+database = db.Database()
+database.create_user_table()
+database.create_booking_table()
+database.create_comment_table()
 
 # app title
 st.title('AirMark Management System')
@@ -17,51 +21,17 @@ st.header('Login In')
 
 
 # ==============  DATABSE CONNECTIVITIES ======================
-@st.experimental_singleton
-def init_connection():
-    return mysql.connector.connect(**st.secrets["mysql"])
 
-conn = init_connection()
-
-# Perform query.
-# Uses st.experimental_memo to only rerun when the query changes or after 10 min.
-
-@st.experimental_memo(ttl=600)
 def get_record(query):
-    with conn.cursor() as cur:
-        cur.execute(query)
-        return cur.fetchall()
+    return database.validate_user_record()
+    
 
-
-
-
-@st.experimental_memo(ttl=600)
-def add_user(id, first_name, second_name, email, password):
-    query = '''INSERT INTO airmark_databases.user(id, first_name, second_name , email, password) VALUES(%s, %s, %s, %s ,%s)'''
-    isSuccess = False 
-    with conn.cursor() as curs: 
-        # (id, first_name, second_name, email, password)
-        curs.execute(query , (id, first_name, second_name, email, password))
-        isSuccess = True
-        print('execution successful')
-    return isSuccess
-
-@st.experimental_memo(ttl=600)
-def add_booking(id, first_name, second_name, email, password):
-    query = '''INSERT INTO airmark_databases.flight_booking(id, first_name, second_name , email, password) VALUES(%s, %s, %s, %s ,%s)'''
-    isSuccess = False 
-    with conn.cursor() as curs: 
-        # (id, first_name, second_name, email, password)
-        curs.execute(query , (id, first_name, second_name, email, password))
-        isSuccess = True
-        print('execution successful')
-    return isSuccess
+def add_user(id, first_name, second_name, email, password,sex, age):
+    database.insert_to_user_table(first_name, second_name, email, password, sex, age)
+    st.write('record addesd successfull')
 
 
 # ========================== END OF DATABASE CONNECTION ===============================
-
-# rows = get_record("SELECT email, password from user;")
-# st.write(rows)
 
 # status message 
 def status_message(status=False, message='error'):
@@ -91,20 +61,26 @@ if sign_button:
 
 if col_one.button('login'):
     # validate credentials 
-    rows = get_record("SELECT email, password from user;")
+    rows = get_record("SELECT email, password, sex from user_table;")
+    st.write(rows)
     # st.write(rows)
-    for d in rows: 
-        username, pas = d[0], d[1]
-        if email.strip() == username.strip() and password.strip() == pas.strip(): 
-            
-            #  creating session 
-            if  'user' not in st.session_state: 
-                st.session_state['user'] = username
-            
-            switch_page_button.switch_page("Home")
-    else: 
-        status_message(True, 'Wrong Email or Password')
-        # st.write('something wrong')
+    if rows == None : 
+        st.warning("No record Found")
+    else :
+
+        for d in rows: 
+            username, pas, sex = d[0], d[1], d[2]
+            if email.strip() == username.strip() and password.strip() == pas.strip(): 
+                
+                #  creating session 
+                if  'user' not in st.session_state: 
+                    st.session_state['user'] = username
+                    st.session_state['sex'] = sex
+                
+                switch_page_button.switch_page("Home")
+        else: 
+            status_message(True, 'Wrong Email or Password')
+            # st.write('something wrong')
 
 
 col_two.checkbox('Remember Me?', value=True)
