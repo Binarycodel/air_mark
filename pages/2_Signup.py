@@ -4,10 +4,20 @@ import databases as db
 import streamlit as st
 
 
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
+
+
 st.set_page_config(page_title="signup" , page_icon='📈')
+with open('style.css') as css: 
+    st.markdown(f'<style>{css.read()}</style>', unsafe_allow_html=True)
 
 # ==============  DATABSE CONNECTIVITIES ======================
-
+# st.set_page_config(initial_sidebar_state="collapsed")
 
 database = db.Database()
 
@@ -16,8 +26,8 @@ def get_record(query):
     return database.custom_query(query)
 
 
-def add_user(first_name, second_name, email, password,sex, age):
-    database.insert_to_user_table(first_name, second_name, email, password, sex, age)
+def add_user(first_name, second_name, email, password,sex, age , booking_id):
+    database.insert_to_user_table(first_name, second_name, email, password, sex, age, booking_id)
     return True 
 
 # ========================== END OF DATABASE CONNECTION ===============================
@@ -55,6 +65,7 @@ sex_panel , age_panel = st.columns([2,1])
 fname = name1.text_input("First Name")
 lname = name2.text_input("Last Name")
 email = email1.text_input("Email")
+booking_id = email2.text_input('Booking ID')
 password = pass1.text_input('Password', type='password')
 password2 = pass2.text_input('Confirm Password', type='password')
 
@@ -72,7 +83,7 @@ if sign_button:
 
 regitem  = [fname, lname, email, password, password2]
 
-if col_one.button('Register'):
+if col_one.button('Submit'):
     # validate data suply 
     print(regitem)
     if "" not in regitem: 
@@ -86,7 +97,7 @@ if col_one.button('Register'):
             st.write(em)
             if email not in em: 
                 st.write('its is true')
-                if add_user(fname, lname, email, password , sex.lower() , int(age)):
+                if add_user(fname, lname, email, password , sex.lower() , int(age) , booking_id.lower()):
                     status_message(False, 'Successful...')
                     switch_page_button.switch_page("login")
                 else : 
