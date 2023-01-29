@@ -61,7 +61,7 @@ class  Database:
         record = self.data.execute(qr).fetchall()
         
         if len(record) == 0: 
-            self.insert_into_admin_table('admin', 'admin' , 'admin001')
+            self.insert_into_admin_table('opheedeonthemove@gmail.com', 'admin' , 'admin001')
         else: 
             pass
 
@@ -119,4 +119,24 @@ class  Database:
         return data.fetchall()
 
 
-   
+
+
+    def create_airlinestaff_table(self):
+        query = '''
+                CREATE TABLE IF NOT EXISTS airlinestaff_table(
+                    staff_name VARCHAR(30) NOT NULL, 
+                    staff_id VARCHAR(30)  NOT NULL,
+                    email VARCHAR(30) PRIMARY KEY NOT NULL, 
+                    password varchar(30) NOT NULL, 
+                    airline VARCHAR(30) NOT NULL 
+        
+                ); 
+                '''
+        self.data.execute(query)
+        print('airline staff created succesfully.. ')
+
+    def insert_into_airlinestaff_table(self, staff_name, staff_id , email , password, airline): 
+        query = '''INSERT INTO airlinestaff_table VALUES (?, ?, ?, ?, ?) '''
+        self.data.execute(query, (staff_name, staff_id , email , password, airline))
+        self.data.commit()
+        return True
